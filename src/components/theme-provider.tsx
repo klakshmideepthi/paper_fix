@@ -4,10 +4,12 @@ import * as React from "react";
 
 type Theme = "dark" | "light" | "system";
 
-type ThemeProviderProps = {
+export type ThemeProviderProps = {
   children: React.ReactNode;
   defaultTheme?: Theme;
   storageKey?: string;
+  enableSystem?: boolean;
+  disableTransitionOnChange?: boolean;
 };
 
 type ThemeProviderState = {
@@ -26,6 +28,8 @@ export function ThemeProvider({
   children,
   defaultTheme = "system",
   storageKey = "ui-theme",
+  enableSystem = true,
+  disableTransitionOnChange = false,
   ...props
 }: ThemeProviderProps) {
   // Initialize with defaultTheme to prevent server/client mismatch
@@ -44,7 +48,7 @@ export function ThemeProvider({
 
     root.classList.remove("light", "dark");
 
-    if (theme === "system") {
+    if (theme === "system" && enableSystem) {
       const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
         ? "dark"
         : "light";
@@ -59,7 +63,7 @@ export function ThemeProvider({
     if (typeof window !== "undefined") {
       localStorage.setItem(storageKey, theme);
     }
-  }, [theme, storageKey]);
+  }, [theme, storageKey, enableSystem]);
 
   const value = {
     theme,

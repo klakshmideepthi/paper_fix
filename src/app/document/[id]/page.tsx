@@ -1,22 +1,37 @@
 "use client";
 
+import React, { Suspense } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { DocumentRepository } from "@/lib/document-repository";
 import { useAuth } from "@/components/auth/AuthContext";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 
-export default function DocumentViewPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const { id } = params;
+// Main component with Suspense boundary
+export default function DocumentViewPage() {
+  return (
+    <Suspense fallback={
+      <div className="container px-4 py-16 flex justify-center">
+        <p>Loading...</p>
+      </div>
+    }>
+      <DocumentViewContent />
+    </Suspense>
+  );
+}
+
+// Inner component using client-side hooks
+function DocumentViewContent() {
+  // Use the useParams hook to get the id parameter
+  const params = useParams();
+  const id = params.id as string;
+  
   const router = useRouter();
   const { user, loading } = useAuth();
+  
   const [document, setDocument] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -51,7 +66,9 @@ export default function DocumentViewPage({
       }
     };
 
-    fetchDocument();
+    if (id) {
+      fetchDocument();
+    }
   }, [id, user, loading, router]);
 
   const handleSave = async () => {

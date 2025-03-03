@@ -1,5 +1,6 @@
 "use client";
 
+import React, { Suspense } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -37,7 +38,24 @@ const safeDecodeURIComponent = (str: string) => {
   }
 };
 
+// Main component that wraps everything in Suspense
 export default function PreviewPage() {
+  return (
+    <Suspense fallback={
+      <div className="container px-4 py-16 md:px-6 flex justify-center items-center">
+        <div className="text-center">
+          <p className="mb-4">Loading document...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+        </div>
+      </div>
+    }>
+      <PreviewContent />
+    </Suspense>
+  );
+}
+
+// Content component with all the actual implementation
+function PreviewContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [content, setContent] = useState("");

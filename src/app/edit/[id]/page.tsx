@@ -1,7 +1,7 @@
-// src/app/edit/[id]/page.tsx
 "use client";
 
 import * as React from "react";
+import { Suspense } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,22 +11,38 @@ import { DocumentRepository } from "@/lib/document-repository";
 import { useAuth } from "@/components/auth/AuthContext";
 import { Document as SupabaseDocument } from "@/lib/supabase";
 
-const { useState, useEffect } = React;
-
+// Main component with Suspense boundary
 export default function EditPage() {
-  // Properly unwrap params using React.use()
+  return (
+    <Suspense fallback={
+      <div className="container px-4 py-16 md:px-6 flex justify-center items-center">
+        <div className="text-center">
+          <p className="mb-4">Loading document...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+        </div>
+      </div>
+    }>
+      <EditPageContent />
+    </Suspense>
+  );
+}
+
+// Inner component using client-side hooks
+function EditPageContent() {
+  // Use the useParams hook to get the id parameter
   const params = useParams();
   const documentId = params.id as string;
+  
   const router = useRouter();
   const { user, loading } = useAuth();
   
-  const [documentData, setDocumentData] = useState<SupabaseDocument | null>(null);
-  const [content, setContent] = useState("");
-  const [title, setTitle] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveStatus, setSaveStatus] = useState("");
-  const [showPreview, setShowPreview] = useState(false);
+  const [documentData, setDocumentData] = React.useState<SupabaseDocument | null>(null);
+  const [content, setContent] = React.useState("");
+  const [title, setTitle] = React.useState("");
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [isSaving, setIsSaving] = React.useState(false);
+  const [saveStatus, setSaveStatus] = React.useState("");
+  const [showPreview, setShowPreview] = React.useState(false);
 
   // Handle document update from chat
   const handleDocumentUpdate = (newContent: string) => {
@@ -70,7 +86,7 @@ export default function EditPage() {
   };
 
   // Load document on initial render
-  useEffect(() => {
+  React.useEffect(() => {
     const fetchDocument = async () => {
       if (!loading) {
         if (!user) {
@@ -97,7 +113,9 @@ export default function EditPage() {
       }
     };
 
-    fetchDocument();
+    if (documentId) {
+      fetchDocument();
+    }
   }, [documentId, user, loading, router]);
 
   // Download document as text
@@ -277,8 +295,6 @@ export default function EditPage() {
 
       {/* Split view layout */}
       <div className="flex flex-col lg:flex-row h-[calc(100vh-13rem)]">
-        
-
         {/* AI Chat panel */}
         <div className="lg:w-1/2 p-4 h-full overflow-hidden">
           <DocumentChatEditor
@@ -330,10 +346,7 @@ export default function EditPage() {
             </CardFooter>
           </Card>
         </div>
-
-        
       </div>
     </div>
   );
 }
-

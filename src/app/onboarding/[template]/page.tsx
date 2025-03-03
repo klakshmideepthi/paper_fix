@@ -1,5 +1,6 @@
 "use client";
 
+import React, { Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,8 +8,8 @@ import { RadioGroup } from "@/components/ui/radio";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { getTemplate } from "@/lib/templates";
-import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import { useRouter, useParams } from "next/navigation";
+import { useState } from "react";
 
 // Safe encode function that won't cause URI errors
 const safeEncodeURIComponent = (str: string) => {
@@ -38,12 +39,25 @@ const safeEncodeURIComponent = (str: string) => {
   }
 };
 
-export default function OnboardingPage({
-  params,
-}: {
-  params: { template: string };
-}) {
-  const templateId = React.use(params).template;
+// Main component with suspense boundary
+export default function OnboardingPage() {
+  return (
+    <Suspense fallback={
+      <div className="container px-4 py-16 flex justify-center">
+        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+      </div>
+    }>
+      <OnboardingContent />
+    </Suspense>
+  );
+}
+
+// Actual content component that uses useParams
+function OnboardingContent() {
+  // Use the useParams hook to get the template parameter
+  const params = useParams();
+  const templateId = params.template as string;
+  
   const router = useRouter();
   const template = getTemplate(templateId);
   const [currentStep, setCurrentStep] = useState(0);

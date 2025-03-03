@@ -23,7 +23,8 @@ export async function POST(req: Request) {
 
     // Set up response to return PDF
     const chunks: Buffer[] = [];
-    let result: Buffer;
+    // Initialize result here to avoid "used before assigned" error
+    let result: Buffer = Buffer.from([]);
 
     // Collect chunks of PDF data
     doc.on('data', (chunk: Buffer) => {
@@ -61,7 +62,7 @@ export async function POST(req: Request) {
       });
     });
 
-    // Return the PDF
+    // Here the result is guaranteed to be assigned because we waited for doc.end() event
     return new Response(result, {
       headers: {
         'Content-Type': 'application/pdf',
