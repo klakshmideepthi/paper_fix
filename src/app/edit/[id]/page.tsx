@@ -327,7 +327,7 @@ function EditPageContent() {
                 <textarea
                   value={content}
                   onChange={(e) => handleDocumentUpdate(e.target.value)}
-                  className="w-full h-full min-h-[500px] p-4 border rounded-md focus:outline-none focus:ring-1 focus:ring-primary resize-none font-mono"
+                  className="w-full h-full min-h-[500px] p-4 border rounded-md focus:outline-none focus:ring-1 focus:ring-primary resize-none font-mono bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                 />
               )}
             </CardContent>
